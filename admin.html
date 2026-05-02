@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="nav">
+        <a href="index.html">📄 Reembolso</a>
+        <a href="login.html">💼 Admin</a>
+        <a href="consulta.html">🔍 Consultar</a>
+    </div>
+
+    <div class="admin-topo">
+
+         <button onclick="logout()">Sair</button>
+         
+         <div class="admin-header">
+            <h1>Painel de Reembolsos 💼</h1>
+         </div>
+
+         <div id="dashboard" style="margin-bottom: 20px;" class="container">
+            <h2>Resumo 📊</h2>
+            <p>Total de Pedidos: <span id="totalPedidos">0</span></p>
+            <p>Total Pago: <span id="totalPago">0</span></p>
+            <p>Pendentes: <span id="pendentes">0</span></P>
+            <p>Valor total reembolsado: R$ <span id="valorTotal">0</span></p>
+         </div>
+
+         <div class="filtros">
+             <button onclick="Filtrar('todos')">Todos</button>
+             <button onclick="Filtrar('em análise')">Em análise</button>
+             <button onclick="Filtrar('aprovado')">Aprovados</button>
+             <button onclick="Filtrar('recusado')">Recusados</button>
+             <button onclick="Filtrar('pago')">Pagos</button>
+         </div>
+    </div>
+
+    <div id="lista"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyA5DBA-4GPDXDyDOgaXfNoZW5rCbaMN4e0",
+            authDomain: "ks-suporte.firebaseapp.com",
+            databaseURL: "https://ks-suporte-default-rtdb.firebaseio.com",
+            projectId: "ks-suporte",
+            storageBucket: "ks-suporte.firebasestorage.app",
+            messagingSenderId: "23976070359",
+            appId: "1:23976070359:web:f5f2258d3b6b55c3d43492"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        if(localStorage.getItem("logado") !== "true"){
+            window.location.href = "login.html"
+        }
+
+        const lista = document.getElementById("lista");
+
+         let filtroAtual = "todos";
+
+        function carregarDados() {
+            
+            firebase.database().ref("reembolsos").off();
+            firebase.database().ref("reembolsos").on("value", snapshot => {
+                lista.innerHTML = "";
+
+                let totalPedidos = 0;
+                let totalPago = 0;
+                let pendentes = 0;
+                let valorTotal = 0;
+
+                snapshot.forEach(item => {
+                    const dados = item.val();
+
+                    const dataFormatada = dados.data
+                    ? new Date(dados.data).toLocaleString("pt-BR")
+                    : "Sem Data";
+
+                    totalPedidos++;
+
+                    const valor = parseFloat(dados.valor) || 0;
+                    valorTotal += valor;
+
+                    if (dados.status === "pago") {
+                        totalPago++;
+                    } else {
+                        pendentes++;
+                    }
+
+                    const status = dados.status || "pendente";
+
+                    if (filtroAtual !== "todos" && status !== filtroAtual) return;
+
+                    const div = document.createElement("div");
+                    div.classList.add("card")
+
+                    div.style.border = "1px solid #ccc";
+                    div.style.margin = "10px";
+                    div.style.padding = "10px";
+
+                   div.innerHTML = `
+                        <strong>Data da solicitação:</strong> ${dataFormatada} <br>
+                        <strong>Nome:</strong> ${dados.nome} <br>
+                        <strong>Pedido:</strong> ${dados.pedido} <br>
+                        <strong>Produto:</strong> ${dados.produto} <br>
+                        <strong>Tipo:</strong> ${dados.tipo} <br>
+                        <strong>Valor:</strong> R$ ${dados.valor} <br>
+                        <strong>Comprovante:</strong><br>
+
+                        ${dados.comprovanteArquivo ? `
+                            ${
+                                dados.comprovanteArquivo.startsWith("data:image")
+                                ? `<img src="${dados.comprovanteArquivo}" style="max-width:250px; margin-top:10px; border-radius:8px;">`
+                                : `<a href="${dados.comprovanteArquivo}" target="_blank" style="color:#ffb3b3;">Ver comprovante PDF 📎</a>`
+                            }
+                        ` : "Não enviado"}
+
+                        <br><br>
+
+                        <strong>Status:</strong> 
+                        <span style="color:${{
+                                "em análise": "#f1c40f",
+                                "aprovado": "#3498db",
+                                "recusado": "#e74c3c",
+                                "pago": "#2ecc71"
+                            }[dados.status] || "#ccc"}">
+                            ${dados.status || "em análise"}
+                        </span>
+                        <br><br>
+
+                        <strong>Termos de Reembolso:</strong> 
+                        <span style="color:${dados.acordoDeReembolso ? "#00ffae" : "#ff7675"}">
+                             ${dados.acordoDeReembolso ? "Aceito ✔" : "Não aceito ❌"}
+                        </span>
+                        <br>
+
+                        <strong>Termos de Envio:</strong> 
+                        <span style="color:${dados.acordoEnvio ? "#00ffae" : "#ff7675"}">
+                            ${dados.acordoEnvio ? "Aceito ✔" : "Não aceito ❌"}
+                        </span>
+                        <br><br>
+
+                        <div style="margin-top:10px;">
+                            <button onclick="alterarStatus('${item.key}', 'em análise')">Em análise</button>
+                            <button onclick="alterarStatus('${item.key}', 'aprovado')">Aprovar</button>
+                            <button onclick="alterarStatus('${item.key}', 'recusado')">Recusar</button>
+                             <button onclick="alterarStatus('${item.key}', 'pago')">Pago</button>
+                        </div>
+
+                        <button onclick="excluir('${item.key}')" style="background:#444; margin-top:5px;"> Excluir 🗑️ </button>
+                    `;
+                    lista.appendChild(div);
+                });
+
+                document.getElementById("totalPedidos").innerText = totalPedidos;
+                document.getElementById("totalPago").innerText = totalPago;
+                document.getElementById("pendentes").innerText = pendentes;
+                document.getElementById("valorTotal").innerText = valorTotal.toFixed(2);
+
+                window.alterarStatus = function(id, novoStatus) {
+                 firebase.database().ref("reembolsos/" + id).update({
+                    status: novoStatus
+                    });
+                }
+
+            });
+
+        }
+
+         window.Filtrar = function(tipo) {
+                    filtroAtual = tipo;
+                    carregarDados();
+                }
+
+                carregarDados();
+
+        function logout() {
+            localStorage.removeItem("logado");
+            window.location.href = "login.html";
+        }
+
+        window.excluir = function(id){
+            const confirmar = confirm("Tem certeza de que deseja excluir esta solicitação?");
+
+            if(!confirmar) return;
+
+            firebase.database().ref("reembolsos/" + id).remove();
+        }
+
+
+    </script>
+
+</body>
+</html>
