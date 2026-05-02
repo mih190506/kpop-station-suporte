@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Admin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="nav">
+        <a href="index.html">📄 Reembolso</a>
+     <a href="login.html">💼 Admin</a>
+        <a href="consulta.html">🔍 Consultar</a>
+    </div>
+
+    <div class="container">
+
+        <div class="header">
+            <img src="imagem/ks logo.png" alt="Logo Kpop Station">
+            <h1>Login Admin 🔐</h1>
+        </div>
+
+    </div>
+
+    <form class="login-card" onsubmit="login(event)">
+
+        <input type="text" id="usuario" placeholder="Usuário" required>
+
+        <input type="password" id="senha" placeholder="Senha" required>
+
+        <label class="termo">
+            <input type="checkbox" onclick="mostrarSenha()"> Mostrar senha
+        </label>
+
+        <button type="submit">Entrar</button>
+
+    </form>
+
+    <p id="erro"></p>
+
+    <script>
+
+        function login(event) {
+            event.preventDefault();
+
+            const user = document.getElementById("usuario").value.trim();
+            const pass = document.getElementById("senha").value.trim();
+
+            if (user === "Ks Adm" && pass === "Ks2026@") {
+                localStorage.setItem("logado", "true");
+                window.location.href = "admin.html";
+            }else{
+                document.getElementById("erro").innerText = "Usuário ou Senha inválidos ❌";
+            }
+        }
+
+        function mostrarSenha(){
+            const senha = document.getElementById("senha");
+
+            if(senha.type === "password"){
+                senha.type = "text";
+            }else{
+                senha.type = "password";
+            }
+        }
+
+    </script>
+    
+</body>
+</html>

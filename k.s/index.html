@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kpop Station-suporte</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="header">
+    <img src="imagem/ks logo.png" width="80">
+    <h1>Kpop Station Suporte</h1>
+  </div>
+
+    <div class="nav">
+      <a href="index.html">📄 Reembolso</a>
+      <a href="login.html">💼 Admin</a>
+      <a href="consulta.html">🔍 Consultar</a>
+    </div>
+    
+    <h1>Kpop Station Suporte</h1>
+    <p>Bem-vind@ ao Suporte da Kpop Station</p> <br>
+    <button onclick="mostrarFormulario()">Solicitar Reembolso</button> <br><br>
+
+    <hr>
+
+   <div id="formulario" style="display:none; margin-top:20px;" class="container">
+   
+        <form onsubmit="enviarFormulario(event)">
+
+            <input type="text" id="nome" placeholder="Nome"><br><br>
+            <input type="text" id="pedido" placeholder="Pedido"><br><br>
+            <input type="text" id="produto" placeholder="Produto"><br><br>
+
+            <textarea id="motivo" placeholder="Motivo"></textarea><br><br>
+
+            <label class="opcao">
+              <input type="radio" name="tipo" value="total"> Total
+            </label>
+
+            <label class="opcao">
+              <input type="radio" name="tipo" value="parcial"> Parcial (Item a parte)
+          </label>
+
+            <input type="number" id="valor" step="0.01" placeholder="Valor"><br><br>
+
+            <label>Comprovante de Pagamento:</label>
+            <input type="file" id="comprovante" accept="image/*,.pdf" required>
+
+            <p>Ao solicitar o reembolso, você concorda que:
+                <br><br>
+                - O prazo de análise é de até 3 dias úteis <br>
+                - O reembolso será feito em até 10 dias após aprovação <br>
+                - Em casos de devolução, o produto deve estar em boas condições <br>
+            </p>
+
+            <label>
+                <input type="checkbox" id="acordoDeReembolso"> Aceito os termos do Reembolso
+            </label>
+
+            <p> Caso seja necessário reenvio, você concorda que:
+                <br><br>
+                - O novo envio será feito após análise <br>
+                - Pode ser necessário devolver o produto <br>
+                - O prazo de envio é de até 5 dias úteis <br>
+            </p>
+
+            <label>
+                <input type="checkbox" id="acordoEnvio"> Aceito os termos de envio
+            </label> <br><br>
+
+            <button type="submit">Enviar</button>
+
+        </form>
+
+    </div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyA5DBA-4GPDXDyDOgaXfNoZW5rCbaMN4e0",
+    authDomain: "ks-suporte.firebaseapp.com",
+    databaseURL: "https://ks-suporte-default-rtdb.firebaseio.com",
+    projectId: "ks-suporte",
+    storageBucket: "ks-suporte.firebasestorage.app",
+    messagingSenderId: "23976070359",
+    appId: "1:23976070359:web:f5f2258d3b6b55c3d43492"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+
+  function mostrarFormulario() {
+    document.getElementById("formulario").style.display = "block";
+  }
+
+  function enviarFormulario(event) {
+  event.preventDefault();
+
+  const nome = document.getElementById("nome").value;
+  const pedido = document.getElementById("pedido").value;
+  const produto = document.getElementById("produto").value;
+  const motivo = document.getElementById("motivo").value;
+  const valor = document.getElementById("valor").value;
+
+  const comprovante = document.getElementById("comprovante").files[0];
+
+  const acordoDeReembolso = document.getElementById("acordoDeReembolso").checked;
+  const acordoEnvio = document.getElementById("acordoEnvio").checked;
+
+  if (!comprovante) {
+    alert("Você precisa anexar o comprovante!");
+    return;
+  }
+
+  if (!acordoDeReembolso || !acordoEnvio) {
+    alert("Você precisa aceitar os termos!");
+    return;
+  }
+
+  const tipoSelecionado = document.querySelector('input[name="tipo"]:checked');
+
+  if (!tipoSelecionado) {
+    alert("Selecione o tipo!");
+    return;
+  }
+
+  const tipo = tipoSelecionado.value;
+
+  const leitor = new FileReader();
+
+  leitor.onload = function () {
+    firebase.database().ref("reembolsos").push({
+      nome,
+      pedido,
+      produto,
+      motivo,
+      tipo,
+      valor,
+      status: "em análise",
+      acordoDeReembolso,
+      acordoEnvio,
+      comprovanteNome: comprovante.name,
+      comprovanteArquivo: leitor.result,
+      data: new Date().toISOString()
+    });
+
+    document.querySelector("form").reset();
+    document.getElementById("formulario").style.display = "none";
+
+  const msg = document.getElementById("mensagem");
+    msg.innerText = "Solicitação enviada com sucesso! 💜";
+    msg.style.display = "block";
+
+    setTimeout(() => {
+      msg.style.display = "none";
+    }, 3000);
+
+  };
+
+  leitor.readAsDataURL(comprovante);
+}
+
+</script>
+
+<div id="mensagem" style="display:none;"></div>
+
+
+</body>
+</html>
