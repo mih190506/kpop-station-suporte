@@ -17,7 +17,7 @@
     
     <h1>Consultar Reembolso 🔍</h1>
 
-    <input type="text" id="busca" placeholder="Digite seu nome ou pedido">
+    <input type="text" id="busca" placeholder="Digite seu nome ou CPF">
     <button onclick="buscar()">Buscar</button>
 
     <div id="resultado" style="margin-top: 20px;"></div>
@@ -57,9 +57,9 @@
                             if (!dados) return;
 
                             const nome = dados.nome ? dados.nome.toLowerCase().trim() : "";
-                            const pedido = dados.pedido ? dados.pedido.toLowerCase().trim() : "";
+                            const cpf = dados.cpf ? dados.cpf.toLowerCase().trim() : "";
 
-                            if (nome.includes(valorBusca) || pedido.includes(valorBusca)) {
+                            if (nome.includes(valorBusca) || cpf.includes(valorBusca)) {
                             
                             encontrou = true;
 

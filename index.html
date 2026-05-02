@@ -31,7 +31,7 @@
         <form onsubmit="enviarFormulario(event)">
 
             <input type="text" id="nome" placeholder="Nome"><br><br>
-            <input type="text" id="pedido" placeholder="Pedido"><br><br>
+            <input type="text" id="cpf" placeholder="CPF (Apenas números)"><br><br>
             <input type="text" id="produto" placeholder="Produto"><br><br>
 
             <textarea id="motivo" placeholder="Motivo"></textarea><br><br>
@@ -101,7 +101,7 @@
   event.preventDefault();
 
   const nome = document.getElementById("nome").value;
-  const pedido = document.getElementById("pedido").value;
+  const cpf = document.getElementById("cpf").value;
   const produto = document.getElementById("produto").value;
   const motivo = document.getElementById("motivo").value;
   const valor = document.getElementById("valor").value;
