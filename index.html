@@ -46,6 +46,17 @@
 
             <input type="number" id="valor" step="0.01" placeholder="Valor"><br><br>
 
+            <input type="text" id="pix" placeholder="Chave PIX"><br><br>
+
+            <select id="banco">
+              <option value="">Selecione o banco</option>
+              <option>Nubank</option>
+              <option>Itaú</option>
+              <option>Bradesco</option>
+              <option>Caixa</option>
+              <option>Banco do Brasil</option>
+            </select>
+
             <label>Comprovante de Pagamento:</label>
             <input type="file" id="comprovante" accept="image/*,.pdf" required>
 
@@ -105,6 +116,8 @@
   const produto = document.getElementById("produto").value;
   const motivo = document.getElementById("motivo").value;
   const valor = document.getElementById("valor").value;
+  const pix = document.getElementById("pix").value;
+  const banco = document.getElementById("banco").value;
 
   const comprovante = document.getElementById("comprovante").files[0];
 
