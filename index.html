@@ -48,15 +48,18 @@
 
             <input type="text" id="pix" placeholder="Chave PIX"><br><br>
 
-            <select id="banco">
+            <select id="banco" onchange="verificarBanco()">
               <option value="">Selecione o banco</option>
-              <option>Nubank</option>
-              <option>PICPAY</option>
-              <option>Itaú</option>
-              <option>Bradesco</option>
-              <option>Caixa</option>
-              <option>Banco do Brasil</option>
+              <option value="Nubank">Nubank</option>
+              <option value="PicPay">PICPAY</option>
+              <option value="Itaú">Itaú</option>
+              <option value="Bradesco">Bradesco</option>
+              <option value="Caixa">Caixa</option>
+              <option value="Banco do Brasil">Banco do Brasil</option>
+               <option value="outros">Outros</option>
             </select>
+
+            <input type="text" id="outroBanco" placeholder="Digite seu banco" style="display:none;">
 
             <label>Comprovante de Pagamento:</label>
             <input type="file" id="comprovante" accept="image/*,.pdf" required>
@@ -109,6 +112,17 @@
     document.getElementById("formulario").style.display = "block";
   }
 
+  function verificarBanco() {
+  const banco = document.getElementById("banco").value;
+  const campoOutro = document.getElementById("outroBanco");
+
+  if (banco === "outros") {
+    campoOutro.style.display = "block";
+  } else {
+    campoOutro.style.display = "none";
+  }
+}
+
   function enviarFormulario(event) {
   event.preventDefault();
 
@@ -118,7 +132,12 @@
   const motivo = document.getElementById("motivo").value;
   const valor = document.getElementById("valor").value;
   const pix = document.getElementById("pix").value;
-  const banco = document.getElementById("banco").value;
+  
+  let banco = document.getElementById("banco").value;
+
+  if (banco === "outros") {
+  banco = document.getElementById("outroBanco").value;
+  }
 
   const comprovante = document.getElementById("comprovante").files[0];
 
@@ -154,6 +173,8 @@
       motivo,
       tipo,
       valor,
+      pix,
+      banco,
       status: "em análise",
       acordoDeReembolso,
       acordoEnvio,
