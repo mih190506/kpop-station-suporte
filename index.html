@@ -30,6 +30,16 @@
    
         <form onsubmit="enviarFormulario(event)">
 
+          <label>Tipo de solicitação:</label>
+            <select id="tipoSolicitacao" onchange="mostrarSecoes()" required>
+            <option value="">Selecione</option>
+            <option value="reembolso">Reembolso</option>
+            <option value="reenvio">Reenvio</option>
+            <option value="ambos">Reembolso + Reenvio</option>
+          </select>
+
+          <div id="secaoReembolso" style="display:none;">
+
             <input type="text" id="nome" placeholder="Nome"><br><br>
             <input type="text" id="cpf" placeholder="CPF (Apenas números)"><br><br>
             <input type="text" id="produto" placeholder="Produto"><br><br>
@@ -42,7 +52,7 @@
 
             <label class="opcao">
               <input type="radio" name="tipo" value="parcial"> Parcial (Item a parte)
-          </label>
+           </label>
 
             <input type="number" id="valor" step="0.01" placeholder="Valor"><br><br>
 
@@ -61,30 +71,56 @@
 
             <input type="text" id="outroBanco" placeholder="Digite seu banco" style="display:none;">
 
+            <label >Data desejada para Reembolso: </label>
+            <input type="date" id="dataReembolso"><br><br>
+
             <label>Comprovante de Pagamento:</label>
             <input type="file" id="comprovante" accept="image/*,.pdf" required>
 
             <p>Ao solicitar o reembolso, você concorda que:
                 <br><br>
                 - O prazo de análise é de até 3 dias úteis <br>
-                - O reembolso será feito em até 10 dias após aprovação <br>
-                - Em casos de devolução, o produto deve estar em boas condições <br>
+                - O reembolso será feito em até 10 dias após aprovação e a partir da data marcada<br>
+                - O valor do reembolso pode variar de acordo com a análise <br>
+                - O reembolso pode ser total ou parcial, dependendo do caso <br>
             </p>
 
             <label>
                 <input type="checkbox" id="acordoDeReembolso"> Aceito os termos do Reembolso
             </label>
 
-            <p> Caso seja necessário reenvio, você concorda que:
+          </div>
+
+          <div id="secaoReenvio" style="display:none;">
+
+            <h3>Dados para Reenvio 📦</h3>
+
+            <input type="text" id="nome" placeholder="Nome"><br><br>
+            <input type="text" id="cpf" placeholder="CPF (Apenas números)"><br><br>
+            <input type="text" id="produto" placeholder="Produto"><br><br>
+            <input type="text" id="endereco" placeholder="Endereço de envio"><br><br>
+            <input type="text" id="numero" placeholder="Número"><br><br>
+            <input type="text" id="complemento" placeholder="Complemento"><br><br>
+            <input type="text" id="bairro" placeholder="Bairro"><br><br>
+            <input type="text" id="cidade" placeholder="Cidade"><br><br>
+            <input type="text" id="estado" placeholder="Estado"><br><br>
+            <input type="text" id="cep" placeholder="CEP"><br><br>
+
+            <label>Data desejada para Reenvio: </label>
+            <input type="date" id="dataReenvio"><br><br>
+
+            <p> Caso seja escolha o reenvio, você concorda que:
                 <br><br>
                 - O novo envio será feito após análise <br>
-                - Pode ser necessário devolver o produto <br>
-                - O prazo de envio é de até 5 dias úteis <br>
+                - O prazo de envio é de até 10 dias úteis <br>
+                - O reenvio pode ser negado caso o endereço esteja incompleto ou incorreto <br>
             </p>
 
             <label>
                 <input type="checkbox" id="acordoEnvio"> Aceito os termos de envio
             </label> <br><br>
+
+          </div>
 
             <button type="submit">Enviar</button>
 
@@ -112,6 +148,27 @@
     document.getElementById("formulario").style.display = "block";
   }
 
+  function mostrarSecoes() {
+    const tipo = document.getElementById("tipoSolicitacao").value;
+    
+    document.getElementById("secaoReembolso").style.display = "none";
+    document.getElementById("secaoReenvio").style.display = "none";
+
+    if (tipo === "reembolso") {
+      document.getElementById("secaoReembolso").style.display = "block";
+    }
+
+     if (tipo === "reenvio") {
+      document.getElementById("secaoReenvio").style.display = "block";
+    }
+    
+    if (tipo === "ambos") {
+      document.getElementById("secaoReembolso").style.display = "block";
+      document.getElementById("secaoReenvio").style.display = "block";
+    }
+  }
+
+
   function verificarBanco() {
   const banco = document.getElementById("banco").value;
   const campoOutro = document.getElementById("outroBanco");
@@ -132,6 +189,14 @@
   const motivo = document.getElementById("motivo").value;
   const valor = document.getElementById("valor").value;
   const pix = document.getElementById("pix").value;
+  const dataReembolso = document.getElementById("dataReembolso").value;
+
+  if(
+    (tipo === "reembolso" || tipo === "ambos") && !dataReembolso
+  ) { 
+    alert("Por favor, selecione a data desejada para o reembolso.");
+    return;
+  }
   
   let banco = document.getElementById("banco").value;
 
@@ -174,6 +239,7 @@
       tipo,
       valor,
       pix,
+      dataReembolso,
       banco,
       status: "em análise",
       acordoDeReembolso,
