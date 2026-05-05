@@ -35,7 +35,6 @@
             <option value="">Selecione</option>
             <option value="reembolso">Reembolso</option>
             <option value="reenvio">Reenvio</option>
-            <option value="ambos">Reembolso + Reenvio</option>
           </select> <br><br>
 
           <div id="secaoReembolso" style="display:none;">
@@ -161,11 +160,6 @@
      if (tipo === "reenvio") {
       document.getElementById("secaoReenvio").style.display = "block";
     }
-    
-    if (tipo === "ambos") {
-      document.getElementById("secaoReembolso").style.display = "block";
-      document.getElementById("secaoReenvio").style.display = "block";
-    }
   }
 
 
@@ -180,7 +174,25 @@
   }
 }
 
-  function enviarFormulario(event) {
+const Limite_Por_Data = 7;
+
+function contarSolicitacoesPorData(campoData, dataEscolhida) {
+return firebase.database().ref("reembolsos").once("value").then(snapshot => {
+  let total = 0;
+
+  snapshot.forEach (item => {
+    const dados = item.val();
+
+    if (dados && dados[campoData] === dataEscolhida) {
+      total++;
+    }
+  });
+
+  return total;
+});
+}
+
+  async function enviarFormulario(event) {
   event.preventDefault();
 
   const nome = document.getElementById("nome").value;
@@ -203,6 +215,10 @@
   if (banco === "outros") {
   banco = document.getElementById("outroBanco").value;
   }
+
+  const tipoSolicitacao = document.getElementById("tipoSolicitacao").value;
+  const dataReembolso = document.getElementById("dataReembolso").value;
+  const dataReenvio = document.getElementById("dataReenvio").value;
 
   const comprovante = document.getElementById("comprovante").files[0];
 
@@ -228,10 +244,39 @@
 
   const tipo = tipoSelecionado.value;
 
+if (tipoSolicitacao === "reembolso" ) {
+  if(!dataReembolso) {
+  alert("Selecione a data desejada para o reembolso!");
+  return;
+  }
+
+  const totalReembolso = await contarSolicitacoesPorData("dataReembolso", dataReembolso);
+
+  if (totalReembolso >= Limite_Por_Data) {
+    alert("Desculpe, já atingimos o limite de reembolsos para essa data. Por favor, escolha outra data.");
+    return;
+  }
+}
+
+if (tipoSolicitacao === "reenvio") {
+  if(!dataReenvio) {
+    alert("Selecione a data desejada para o reenvio!");
+    return;
+  }
+
+  const totalReenvio = await contarSolicitacoesPorData("dataReenvio", dataReenvio);
+  
+  if (totalReenvio >= Limite_Por_Data) {
+    alert("Desculpe, já atingimos o limite de reenvios para essa data. Por favor, escolha outra data.");
+    return;
+  }
+}
+
   const leitor = new FileReader();
 
   leitor.onload = function () {
     firebase.database().ref("reembolsos").push({
+      tipoSolicitacao,
       nome,
       cpf,
       produto,
@@ -240,6 +285,7 @@
       valor,
       pix,
       dataReembolso,
+      dataReenvio,
       banco,
       status: "em análise",
       acordoDeReembolso,
