@@ -201,7 +201,6 @@ return firebase.database().ref("reembolsos").once("value").then(snapshot => {
   const motivo = document.getElementById("motivo").value;
   const valor = document.getElementById("valor").value;
   const pix = document.getElementById("pix").value;
-  const dataReembolso = document.getElementById("dataReembolso").value;
 
   if(
     (tipo === "reembolso" || tipo === "ambos") && !dataReembolso
