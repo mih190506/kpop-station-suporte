@@ -25,15 +25,20 @@
 
          <div id="dashboard" style="margin-bottom: 20px;" class="container">
             <h2>Resumo 📊</h2>
-            <p>Total de Pedidos: <span id="totalPedidos">0</span></p>
-            <p>Total Pago: <span id="totalPago">0</span></p>
-            <p>Pendentes: <span id="pendentes">0</span></P>
-            <p>Valor total reembolsado: R$ <span id="valorTotal">0</span></p>
+            <p>Total de Solicitações: <span id="totalSolicitacoes">0</span></p>
+            <p>Reembolsos: <span id="totalReembolsos">0</span></p>
+            <p>Reenvios: <span id="totalReenvios">0</span></p>
+            <p>Em Análise: <span id="emAnalise">0</span></p>
+            <p>Aprovados: <span id="aprovados">0</span></p>
+            <p>Recusados: <span id="recusados">0</span></p>
+            <p>Pagos: <span id="pagos">0</span></p>
          </div>
 
          <div class="filtros">
              <button onclick="Filtrar('todos')">Todos</button>
-             <button onclick="Filtrar('em análise')">Em análise</button>
+             <button onclick="Filtrar('reembolso')">Reembolsos</button>
+             <button onclick="Filtrar('reenvio')">Reenvios</button>
+             <button onclick="Filtrar('em análise')">Em Análise</button>
              <button onclick="Filtrar('aprovado')">Aprovados</button>
              <button onclick="Filtrar('recusado')">Recusados</button>
              <button onclick="Filtrar('pago')">Pagos</button>
@@ -72,10 +77,13 @@
             firebase.database().ref("reembolsos").on("value", snapshot => {
                 lista.innerHTML = "";
 
-                let totalPedidos = 0;
-                let totalPago = 0;
-                let pendentes = 0;
-                let valorTotal = 0;
+                let totalSolicitacoes = 0;
+                let totalReembolsos = 0;
+                let totalReenvios = 0;
+                let emAnalise = 0;
+                let aprovados = 0;
+                let recusados = 0;
+                let pagos = 0;
 
                 snapshot.forEach(item => {
                     const dados = item.val();
@@ -84,20 +92,39 @@
                     ? new Date(dados.data).toLocaleString("pt-BR")
                     : "Sem Data";
 
-                    totalPedidos++;
-
-                    const valor = parseFloat(dados.valor) || 0;
-                    valorTotal += valor;
-
-                    if (dados.status === "pago") {
-                        totalPago++;
-                    } else {
-                        pendentes++;
+                    totalSolicitacoes++;
+                    if (dados.tipoSolicitacao === "reembolso") {
+                        totalReembolsos++;
                     }
 
-                    const status = dados.status || "pendente";
+                    if (dados.tipoSolicitacao === "reenvio") {
+                        totalReenvios++;
+                    }
 
-                    if (filtroAtual !== "todos" && status !== filtroAtual) return;
+                     if (dados.status === "em análise") {
+                        emAnalise++;
+                    } else if (dados.status === "aprovado") {
+                        aprovados++;
+                    } else if (dados.status === "recusado") {
+                        recusados++;
+                    } else if (dados.status === "pago") {
+                        pagos++;
+                    }
+
+                    document.getElementById("totalSolicitacoes").innerText = totalSolicitacoes;
+                    document.getElementById("totalReembolsos").innerText = totalReembolsos;
+                    document.getElementById("totalReenvios").innerText = totalReenvios;
+                    document.getElementById("emAnalise").innerText = emAnalise;
+                    document.getElementById("aprovados").innerText = aprovados;
+                    document.getElementById("recusados").innerText = recusados;
+                    document.getElementById("pagos").innerText = pagos;
+
+                    const status = dados.status || "em análise";
+                    const tipoSolicitacao = dados.tipoSolicitacao || "";
+
+                    if (filtroAtual !== "todos" && status !== filtroAtual && tipoSolicitacao !== filtroAtual) {
+                        return;
+                    }
 
                     const div = document.createElement("div");
                     div.classList.add("card")
@@ -108,16 +135,23 @@
 
                    div.innerHTML = `
                         <strong>Data da solicitação:</strong> ${dataFormatada} <br>
-                        <strong>Nome:</strong> ${dados.nome} <br>
-                        <strong>CPF:</strong> ${dados.cpf} <br>
-                        <strong>Produto:</strong> ${dados.produto} <br>
-                        <strong>Tipo:</strong> ${dados.tipo} <br>
-                        <strong>Valor:</strong> R$ ${dados.valor} <br>
-                        <strong>PIX:</strong> ${dados.pix || "Não informado"} <br>
-                        <strong>Banco:</strong> ${dados.banco || "Não informado"} <br>
-                        <strong>Comprovante:</strong><br>
+                        <strong>Tipo de solicitação:</strong> ${dados.tipoSolicitacao || "Não informado"} <br>
+                        <strong>Nome:</strong> ${dados.nome || "Não informado"} <br>
+                        <strong>CPF:</strong> ${dados.cpf || "Não informado"} <br>
+                        <strong>Telefone:</strong> ${dados.telefone || "Não informado"} <br>
+                        <strong>Produto:</strong> ${dados.produto || "Não informado"} <br>
 
-                        ${dados.comprovanteArquivo ? `
+                        ${dados.tipoSolicitacao === "reembolso" ? `
+                            <h3> Dados do Reembolso 💰</h3>
+                            <strong>Tipo:</strong> ${dados.tipo} <br>
+                            <strong>Valor:</strong> R$ ${dados.valor} <br>
+                            <strong>PIX:</strong> ${dados.pix || "Não informado"} <br>
+                            <strong>Banco:</strong> ${dados.banco || "Não informado"} <br>
+                            <strong>Data de Reembolso:</strong> ${dados.dataReembolso || "Não informada"} <br>
+                            <strong>Motivo:</strong> ${dados.motivo || "Não informado"} <br>
+
+                            <strong>Comprovante:</strong><br>
+                            ${dados.comprovanteArquivo ? `
                             ${
                                 dados.comprovanteArquivo.startsWith("data:image")
                                 ? `<img src="${dados.comprovanteArquivo}" style="max-width:250px; margin-top:10px; border-radius:8px;">`
@@ -126,6 +160,33 @@
                         ` : "Não enviado"}
 
                         <br><br>
+
+                        <strong>Termos de Reembolso:</strong> 
+                        <span style="color:${dados.acordoDeReembolso ? "#00ffae" : "#ff7675"}">
+                             ${dados.acordoDeReembolso ? "Aceito ✔" : "Não aceito ❌"}
+                        </span>
+                        <br><br>
+
+                        ` : ""}
+
+                    ${dados.tipoSolicitacao === "reenvio" ? `
+                        <h3> Dados do Reenvio 📦 </h3>
+                        <strong>Endereço:</strong> ${dados.endereco || "Não informado"} <br>
+                        <strong>Número:</strong> ${dados.numero || "Não informado"} <br>
+                        <strong>Complemento:</strong> ${dados.complemento || "Não informado"} <br>
+                        <strong>Bairro:</strong> ${dados.bairro || "Não informado"} <br>
+                        <strong>Cidade:</strong> ${dados.cidade || "Não informado"} <br>
+                        <strong>Estado:</strong> ${dados.estado || "Não informado"} <br>
+                        <strong>CEP:</strong> ${dados.cep || "Não informado"} <br>
+                        <strong>Data de Reenvio:</strong> ${dados.dataReenvio || "Não informada"} <br><br>
+
+                         <strong>Termos de Envio:</strong> 
+                        <span style="color:${dados.acordoEnvio ? "#00ffae" : "#ff7675"}">
+                            ${dados.acordoEnvio ? "Aceito ✔" : "Não aceito ❌"}
+                        </span>
+                        <br><br>
+
+                    ` : ""}
 
                         <strong>Status:</strong> 
                         <span style="color:${{
@@ -138,17 +199,6 @@
                         </span>
                         <br><br>
 
-                        <strong>Termos de Reembolso:</strong> 
-                        <span style="color:${dados.acordoDeReembolso ? "#00ffae" : "#ff7675"}">
-                             ${dados.acordoDeReembolso ? "Aceito ✔" : "Não aceito ❌"}
-                        </span>
-                        <br>
-
-                        <strong>Termos de Envio:</strong> 
-                        <span style="color:${dados.acordoEnvio ? "#00ffae" : "#ff7675"}">
-                            ${dados.acordoEnvio ? "Aceito ✔" : "Não aceito ❌"}
-                        </span>
-                        <br><br>
 
                         <div style="margin-top:10px;">
                             <button onclick="alterarStatus('${item.key}', 'em análise')">Em análise</button>
@@ -159,13 +209,10 @@
 
                         <button onclick="excluir('${item.key}')" style="background:#444; margin-top:5px;"> Excluir 🗑️ </button>
                     `;
+
                     lista.appendChild(div);
                 });
 
-                document.getElementById("totalPedidos").innerText = totalPedidos;
-                document.getElementById("totalPago").innerText = totalPago;
-                document.getElementById("pendentes").innerText = pendentes;
-                document.getElementById("valorTotal").innerText = valorTotal.toFixed(2);
 
                 window.alterarStatus = function(id, novoStatus) {
                  firebase.database().ref("reembolsos/" + id).update({

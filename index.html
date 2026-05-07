@@ -40,6 +40,7 @@
           <div id="dadosGerais" style="display: none;">
             <input type="text" id="nome" placeholder="Nome"><br><br>
             <input type="text" id="cpf" placeholder="CPF (com pontos e hífen)"><br><br>
+            <input type="tel" id="telefone" placeholder="Número de telefone (com DDD)"><br><br>
             <input type="text" id="produto" placeholder="Produto"><br><br>
           </div>
 
@@ -73,6 +74,7 @@
 
             <label >Data desejada para Reembolso: </label>
             <input type="date" id="dataReembolso"><br><br>
+            <p id="avisoDataReembolso"></p>
 
             <label>Comprovante de Pagamento:</label>
             <input type="file" id="comprovante" accept="image/*,.pdf" required>
@@ -104,6 +106,7 @@
 
             <label>Data desejada para Reenvio: </label>
             <input type="date" id="dataReenvio"><br><br>
+            <p id="avisoDataReenvio"></p>
 
             <p> Caso seja escolha o reenvio, você concorda que:
                 <br><br>
@@ -192,6 +195,27 @@ return firebase.database().ref("reembolsos").once("value").then(snapshot => {
 });
 }
 
+async function verificarDisponibilidadeData(campoData, avisoId) {
+  const dataEscolhida = document.getElementById(campoData).value;
+  const aviso = document.getElementById(avisoId).value;
+
+  if(!dataEscolhida){
+    aviso.innerText = "";
+    return
+  }
+
+  const total = await contarSolicitacoesPorData(campoData, dataEscolhida);
+  const vagasRestantes = Limite_Por_Data - total;
+
+  if(vagasRestantes <= 0) {
+    aviso.innerText = "Data indisponivel, escolha outra data."
+    aviso.style.color = "#ff7675"; 
+  } else {
+    aviso.innerText = `Data disponível. Restam ${vagasRestantes} vaga(s)`
+    aviso.style.color = "#2ecc71";
+  }
+}
+
   async function enviarFormulario(event) {
   event.preventDefault();
 
@@ -199,6 +223,7 @@ return firebase.database().ref("reembolsos").once("value").then(snapshot => {
 
   const nome = document.getElementById("nome").value;
   const cpf = document.getElementById("cpf").value;
+  const telefone = document.getElementById("telefone").value;
   const produto = document.getElementById("produto").value;
 
   if (!tipoSolicitacao) {
@@ -206,8 +231,8 @@ return firebase.database().ref("reembolsos").once("value").then(snapshot => {
     return;
   }
 
-  if (!nome || !cpf || !produto) {
-    alert("Preencha nome, CPF e produto!");
+  if (!nome || !cpf || !telefone || !produto) {
+    alert("Preencha nome, CPF, Número de telefone e produto!");
     return;
   }
 
@@ -215,6 +240,7 @@ return firebase.database().ref("reembolsos").once("value").then(snapshot => {
     tipoSolicitacao,
     nome,
     cpf,
+    telefone,
     produto,
     status: "em análise",
     data: new Date().toISOString()
