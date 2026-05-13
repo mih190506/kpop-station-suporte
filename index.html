@@ -72,9 +72,6 @@
 
             <input type="text" id="outroBanco" placeholder="Digite seu banco" style="display:none;">
 
-            <label >Data desejada para Reembolso: </label>
-            <input type="date" id="dataReembolso"><br><br>
-            <p id="avisoDataReembolso"></p>
 
             <label>Comprovante de Pagamento:</label>
             <input type="file" id="comprovante" accept="image/*,.pdf" required>
@@ -103,10 +100,6 @@
             <input type="text" id="cidade" placeholder="Cidade"><br><br>
             <input type="text" id="estado" placeholder="Estado"><br><br>
             <input type="text" id="cep" placeholder="CEP"><br><br>
-
-            <label>Data desejada para Reenvio: </label>
-            <input type="date" id="dataReenvio"><br><br>
-            <p id="avisoDataReenvio"></p>
 
             <p> Caso seja escolha o reenvio, você concorda que:
                 <br><br>
@@ -177,44 +170,6 @@
   }
 }
 
-const Limite_Por_Data = 7;
-
-function contarSolicitacoesPorData(campoData, dataEscolhida) {
-return firebase.database().ref("reembolsos").once("value").then(snapshot => {
-  let total = 0;
-
-  snapshot.forEach (item => {
-    const dados = item.val();
-
-    if (dados && dados[campoData] === dataEscolhida) {
-      total++;
-    }
-  });
-
-  return total;
-});
-}
-
-async function verificarDisponibilidadeData(campoData, avisoId) {
-  const dataEscolhida = document.getElementById(campoData).value;
-  const aviso = document.getElementById(avisoId).value;
-
-  if(!dataEscolhida){
-    aviso.innerText = "";
-    return
-  }
-
-  const total = await contarSolicitacoesPorData(campoData, dataEscolhida);
-  const vagasRestantes = Limite_Por_Data - total;
-
-  if(vagasRestantes <= 0) {
-    aviso.innerText = "Data indisponivel, escolha outra data."
-    aviso.style.color = "#ff7675"; 
-  } else {
-    aviso.innerText = `Data disponível. Restam ${vagasRestantes} vaga(s)`
-    aviso.style.color = "#2ecc71";
-  }
-}
 
   async function enviarFormulario(event) {
   event.preventDefault();
@@ -250,7 +205,6 @@ async function verificarDisponibilidadeData(campoData, avisoId) {
     const motivo = document.getElementById("motivo").value;
     const valor = document.getElementById("valor").value;
     const pix = document.getElementById("pix").value;
-    const dataReembolso = document.getElementById("dataReembolso").value;
     const comprovante = document.getElementById("comprovante").files[0];
     const acordoDeReembolso = document.getElementById("acordoDeReembolso").checked;
 
@@ -299,7 +253,6 @@ async function verificarDisponibilidadeData(campoData, avisoId) {
         valor,
         pix,
         banco,
-        dataReembolso,
         acordoDeReembolso,
         comprovanteNome: comprovante.name,
         comprovanteArquivo: leitor.result
@@ -319,7 +272,6 @@ async function verificarDisponibilidadeData(campoData, avisoId) {
     const cidade = document.getElementById("cidade").value;
     const estado = document.getElementById("estado").value;
     const cep = document.getElementById("cep").value;
-    const dataReenvio = document.getElementById("dataReenvio").value;
     const acordoEnvio = document.getElementById("acordoEnvio").checked;
 
     if (!endereco || !numero || !bairro || !cidade || !estado || !cep || !dataReenvio) {
@@ -348,7 +300,6 @@ async function verificarDisponibilidadeData(campoData, avisoId) {
       cidade,
       estado,
       cep,
-      dataReenvio,
       acordoEnvio
     });
 
