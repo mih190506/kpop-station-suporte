@@ -71,6 +71,13 @@
 
          let filtroAtual = "todos";
 
+         function formatarData(data){
+            if (!data) return "Não informada";
+
+            const partes = data.split("-");
+            return `${partes[2]}/${partes[1]}/${partes[0]}`;
+         }
+
         function carregarDados() {
             
             firebase.database().ref("reembolsos").off();
@@ -147,7 +154,7 @@
                             <strong>Valor:</strong> R$ ${dados.valor} <br>
                             <strong>PIX:</strong> ${dados.pix || "Não informado"} <br>
                             <strong>Banco:</strong> ${dados.banco || "Não informado"} <br>
-                            <strong>Data de Reembolso:</strong> ${dados.dataReembolso || "Não informada"} <br>
+                            <strong>Data de Reembolso:</strong> ${formatarData(dados.dataReembolso) || "Não informada"} <br>
                             <strong>Motivo:</strong> ${dados.motivo || "Não informado"} <br>
 
                             <strong>Comprovante:</strong><br>
@@ -178,7 +185,7 @@
                         <strong>Cidade:</strong> ${dados.cidade || "Não informado"} <br>
                         <strong>Estado:</strong> ${dados.estado || "Não informado"} <br>
                         <strong>CEP:</strong> ${dados.cep || "Não informado"} <br>
-                        <strong>Data de Reenvio:</strong> ${dados.dataReenvio || "Não informada"} <br><br>
+                        <strong>Data de Reenvio:</strong> ${formatarData(dados.dataReenvio) || "Não informada"} <br><br>
 
                          <strong>Termos de Envio:</strong> 
                         <span style="color:${dados.acordoEnvio ? "#00ffae" : "#ff7675"}">
