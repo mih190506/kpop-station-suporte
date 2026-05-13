@@ -13,7 +13,6 @@
         <a href="index.html">📄 Solicitação</a>
         <a href="login.html">💼 Admin</a>
         <a href="consulta.html">🔍 Consultar</a>
-        <a href="termo.html">📄 Termos</a>
     </div>
 
     <div class="admin-topo">
@@ -225,6 +224,9 @@
                         <button onclick="excluir('${item.key}')" style="background:#444; margin-top:5px;"> Excluir 🗑️ </button>
                     `;
 
+                    const cpfSolicitacao = dados.cpf || "";
+                    buscarTermoPorCpf(cpfSolicitacao, div);
+
                     lista.appendChild(div);
                 });
 
@@ -237,6 +239,36 @@
 
             });
 
+        }
+
+        function buscarTermoPorCpfAdmin(cpfBusca, divSolicitacao) {
+            firebase.database().ref("termos").once("value", snapshot => {
+                let termoEncontrado = false;
+
+                snapshot.forEach(item => {
+                    const termo = item.val();
+
+                    if (!termo) return;
+
+                    if ((termo.cpf || "").trim() === cpfBUsca.trim ()){
+                        termoEncontrado = termo;
+                    }
+                });
+
+                if(termoEncontrado){
+                    divSolicitacao.innerHTML += `
+                    <hr>
+                    <h3>Termo vinculado 📄</h3>
+                    <strong>Tipo:</strong> ${termoEncontrado.tipo || termoEncontrado.tipoTermo} <br>
+                    <strong>Valor:</strong> R$ ${termoEncontrado.valor || termoEncontrado.valorTermo} <br><br>
+                    ${
+                        termoEncontrado.fotoTermo || termoEncontrado.fotoTermoArquivo
+                        ?`<img src="${termoEncontrado.fotoTermo || termoEncontrado.fotoTermoArquivo}" style="max-width:250px; border-radius:10px;">`
+                        : "Nenhuma foto disponível"
+                    }
+                        `;
+                }
+            });
         }
 
          window.Filtrar = function(tipo) {

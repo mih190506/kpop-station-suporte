@@ -13,7 +13,6 @@
      <a href="index.html">📄 Solicitação</a>
      <a href="login.html">💼 Admin</a>
      <a href="consulta.html">🔍 Consultar</a>
-     <a href="termo.html">📄 Termos</a>
   </div>
     
     <h1>Consultar Solicitação 🔍</h1>
@@ -22,6 +21,11 @@
     <button onclick="buscar()">Buscar</button>
 
     <div id="resultado" style="margin-top: 20px;"></div>
+
+    <h2>Consultar Termos 🔍</h2>
+    <input type="text" id="buscaTermo" placeholder="Digite nome ou CPF para buscar">
+    <button onclick="buscarTermo()">Buscar Termos</button>
+    <div id="resultadoTermos" style="margin-top: 20px;"></div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -79,12 +83,10 @@
                                 <strong>Tipo de Solicitação:</strong> ${dados.tipoSolicitacao} <br>
 
                                 ${dados.tipoSolicitacao === "reembolso" ? `
-                                   <strong>Data de Reembolso:</strong> ${ formatarData(dados.dataReembolso) || "Não informado"} <br>
                                    <strong>Valor:</strong> R$ ${dados.valor || "0"} <br>
                                 `: ""}
 
                                 ${dados.tipoSolicitacao === "reenvio" ? `
-                                   <strong>Data de Envio:</strong> ${formatarData(dados.dataReenvio) || "Não informado"} <br>
                                    <strong>Cidade:</strong> ${dados.cidade || "Não informado"} <br>
                                    <strong>Estado:</strong> ${dados.estado || "Não informado"} <br>
                                 `: ""}
@@ -95,16 +97,105 @@
                                 </span>
                             `;
 
+                            const cpfSolicitacao = dados.cpf || "";
+                            buscarTermoPorCpf(cpfSolicitacao, div);
+
                             resultado.appendChild(div);
                         }
                     });
 
-                    if(!encotrou) {
+                    if(!encontrou) {
                         resultado.innerHTML = "Nenhum resultado encontrado 😢";
                     }
 
               });
         }
+
+        function buscarTermo() {
+            const busca = document.getElementById("buscaTermo").value.toLowerCase().trim();
+            const resultado = document.getElementById("resultadoTermos");
+
+            resultado.innerHTML = "Buscando...";
+
+            firebase.database().ref("termos").once("value", snapshot => {
+                resultado.innerHTML = "";
+
+                let encontrou = false;
+
+                snapshot.forEach(item => {
+                    const termo = item.val();
+
+                    if (!termo) return;
+
+                    const nome = (termo.nome || "").toLowerCase().trim();
+                    const cpf = (termo.cpf || "").toLowerCase().trim();
+
+                    if (nome.includes(busca) || cpf.includes(busca)) {
+                        encontrou = true;
+
+                        const div = document.createElement("div");
+                        div.classList.add("card");
+
+                        div.innerHTML = `
+                        <strong>Nome:</strong> ${termo.nome} <br>
+                        <strong>CPF:</strong> ${termo.cpf} <br>
+                        <strong>Tipo de Termo:</strong> ${termo.tipo} <br>
+                        <strong>Valor:</strong> R$ ${termo.valor} <br>
+
+                        ${termo.fotoTermo ? `
+                            <img src="${termo.fotoTermo}" style="max-width:250px; border-radius:10px;">
+                            ` : "Nenhuma foto disponível"
+                        }
+
+                        `;
+
+                        resultado.appendChild(div);
+                    }
+                });
+
+                if (!encontrou) {
+                    resultado.innerHTML = "Nenhum termo encontrado para essa busca.";
+                }
+            });
+        }
+
+        function buscarTermoPorCpf(cpfBusca, divSolicitacao) {
+            firebase.database().ref("termos").once("value", snapshot => {
+
+                let termoEncontrado = false;
+
+                snapshot.forEach(item => {
+                    const termo = item.val();
+
+                    if (!termo) return;
+
+                    if ((termo.cpf || "").trim() === cpfBusca.trim()){
+                        termoEncontrado = termo;
+                    };
+                 });
+
+                 if (termoEncontrado) {
+                    divSolicitacao.innerHTML += `
+                    <hr>
+                    <h3> Termo vinculado 📄</h3>
+                    <strong>Tipo de Termo:</strong> ${termoEncontrado.tipo} <br>
+                    <strong>Valor:</strong> R$ ${termoEncontrado.valor} <br><br>
+
+                    ${termoEncontrado.fotoTermo ? `
+                        <img src="${termoEncontrado.fotoTermo}" style="max-width:250px; border-radius:10px;">
+                     ` : "Nenhuma foto disponível"
+                    }
+                    `;
+
+                } else {
+                    divSolicitacao.innerHTML += `
+                    <hr>
+                    <strong>Termo vinculado:</strong> Nenhum termo encontrado para este CPF.
+                    `;
+                }
+            });
+         }
+        
 
     </script>
 
