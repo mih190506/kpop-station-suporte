@@ -32,6 +32,7 @@
             <p>Aprovados: <span id="aprovados">0</span></p>
             <p>Recusados: <span id="recusados">0</span></p>
             <p>Pagos: <span id="pagos">0</span></p>
+            <p>Cancelados: <span id="cancelados">0</span></p>
          </div>
 
          <div class="filtros">
@@ -42,6 +43,7 @@
              <button onclick="Filtrar('aprovado')">Aprovados</button>
              <button onclick="Filtrar('recusado')">Recusados</button>
              <button onclick="Filtrar('pago')">Pagos</button>
+             <button onclick="Filtrar('cancelado')">Cancelados</button>
          </div>
     </div>
 
@@ -91,6 +93,7 @@
                 let aprovados = 0;
                 let recusados = 0;
                 let pagos = 0;
+                let cancelados = 0;
 
                 snapshot.forEach(item => {
                     const dados = item.val();
@@ -116,6 +119,8 @@
                         recusados++;
                     } else if (dados.status === "pago") {
                         pagos++;
+                    } else if (dados.status === "cancelado") {
+                        cancelados++;
                     }
 
                     document.getElementById("totalSolicitacoes").innerText = totalSolicitacoes;
@@ -125,7 +130,7 @@
                     document.getElementById("aprovados").innerText = aprovados;
                     document.getElementById("recusados").innerText = recusados;
                     document.getElementById("pagos").innerText = pagos;
-
+                    document.getElementById("cancelados").innerText = cancelados;
                     const status = dados.status || "em análise";
                     const tipoSolicitacao = dados.tipoSolicitacao || "";
 
@@ -200,7 +205,8 @@
                                 "em análise": "#f1c40f",
                                 "aprovado": "#3498db",
                                 "recusado": "#e74c3c",
-                                "pago": "#2ecc71"
+                                "pago": "#2ecc71",
+                                "cancelado": "#95a5a6"
                             }[dados.status] || "#ccc"}">
                             ${dados.status || "em análise"}
                         </span>
@@ -211,7 +217,8 @@
                             <button onclick="alterarStatus('${item.key}', 'em análise')">Em análise</button>
                             <button onclick="alterarStatus('${item.key}', 'aprovado')">Aprovar</button>
                             <button onclick="alterarStatus('${item.key}', 'recusado')">Recusar</button>
-                             <button onclick="alterarStatus('${item.key}', 'pago')">Pago</button>
+                            <button onclick="alterarStatus('${item.key}', 'pago')">Pago</button>
+                            <button onclick="alterarStatus('${item.key}', 'cancelado')" style="background:#555;">Cancelar</button>
                         </div>
 
                         <button onclick="excluir('${item.key}')" style="background:#444; margin-top:5px;"> Excluir 🗑️ </button>
