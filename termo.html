@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termos</title>
+</head>
+<body>
+
+    <div class="nav">
+        <a href="index.html">📄 Solicitação</a>
+        <a href="login.html">💼 Admin</a>
+        <a href="consulta.html">🔍 Consultar</a>
+        <a href="termo.html">📄 Termos</a>
+    </div>
+
+
+    <form onsubmit="salvarTermo(event)">
+        <input type="text" id="nomeTermo" placeholder="Digite seu nome completo" required>
+        <input type="text" id="cpfTermo" placeholder="Digite seu CPF" required>
+
+        <select id="tipoTermo" required>
+            <option value="">Selecione o tipo de termo</option>
+            <option value="reembolso">Reembolso</option>
+            <option value="reenvio">Reenvio</option>
+        </select>
+
+        <input type="number" id="valorTermo" step="0.01" placeholder="Valor do Termo">
+
+        <label > Foto do Termo: </label>
+        <input type="file" id="fotoTermo" accept="image/*" required>
+
+        <button type="submit">Salvar Termo</button>
+    </form>
+
+    <hr><br>
+
+    <h2> Buscar Termos 🔍</h2>
+    <input type="text" id="buscaTermo" placeholder="Digite nome ou CPF para buscar">
+    <button onclick="buscarTermos()">Buscar Termos</button>
+    <div id="resultadoTermos" style="margin-top: 20px;"></div>
+
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyA5DBA-4GPDXDyDOgaXfNoZW5rCbaMN4e0",
+            authDomain: "ks-suporte.firebaseapp.com",
+            databaseURL: "https://ks-suporte-default-rtdb.firebaseio.com",
+            projectId: "ks-suporte",
+            storageBucket: "ks-suporte.firebasestorage.app",
+            messagingSenderId: "23976070359",
+            appId: "1:23976070359:web:f5f2258d3b6b55c3d43492"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        function salvarTermo (event) {
+            event.preventDefault();
+
+            const nome = document.getElementById("nomeTermo").value;
+            const cpf = document.getElementById("cpfTermo").value;
+            const tipo = document.getElementById("tipoTermo").value;
+            const valor = document.getElementById("valorTermo").value;
+            const foto = document.getElementById("fotoTermo").files[0];
+
+            if (!foto) {
+                alert("Por favor, selecione uma foto do termo.");
+                return;
+            }
+
+            const leitor = new FileReader();
+
+            leitor.onload = function () {
+                firebase.database().ref("termos").push({
+                    nome,
+                    cpf,
+                    tipo,
+                    valor,
+                    fotoNome: foto.name,
+                    fotoTermo: leitor.result,
+                    data: new Date().toISOString()
+                });
+
+                alert("Termo salvo com sucesso!");
+                document.getElementById("form").reset();    
+            };
+
+            leitor.readAsDataURL(foto);
+        }
+
+        function buscarTermos(){
+            const busca = document.getElementById("buscaTermo").value.toLowerCase().trim();
+            const resultado = document.getElementById("resultadoTermos");
+
+            resultado.innerHTML = "Buscando...";
+
+            firebase.database().ref("termos").once("value", snapshot => {
+                resultado.innerHTML = "";
+
+                let encontrou = false;
+
+                snapshot.foreach (item => {
+                    const termo = item.val();
+
+                    if (!termo) return;
+
+                    const nome = (termo.nome || "").toLowerCase().trim();
+                    const cpf = (termo.cpf || "").toLowerCase().trim();
+
+                    if (nome.includes(busca) || cpf.includes(busca)) {
+                        encontrou = true;
+
+                        const div = document.createElement("div");
+                        div.classList.add("card");
+
+                        div.innerHTML = `
+                        <strong>Nome:</strong> ${termo.nome} <br>
+                        <strong>CPF:</strong> ${termo.cpf} <br>
+                        <strong>Tipo de Termo:</strong> ${termo.tipo} <br>
+                        <strong>Valor:</strong> R$ ${termo.valor} <br>
+
+                        <strong>Foto do Termo:</strong> <br>
+                        <img src="${termo.fotoTermo}" style="max-width:250px; border-radius:8px; margin-top:10px;">
+                        `;
+
+                        resultado.appendChild(div);
+                    }
+                });
+
+                if (!encontrou) {
+                    resultado.innerHTML = "Nenhum termo encontrado para essa busca.";
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
