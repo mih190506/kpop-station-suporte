@@ -105,7 +105,7 @@
                                      ${dados.status || "em análise"}
                                 </span>
 
-                                ${dados.rastreio ? `
+                                ${dados.tipoSolicitacao === "reenvio" && dados.rastreio ? `
                                 <br><br>
                                 <strong>Código de rastreio:</strong> ${dados.rastreio} <br>
                                 <a href="https://rastreamento.correios.com.br/app/index.php" target="_blank">Rastrear nos Correios 📦</a>
