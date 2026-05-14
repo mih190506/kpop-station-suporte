@@ -48,6 +48,8 @@
     </div>
 
     <div id="lista"></div>
+    <h2>Termos cadastrados 📄</h2>
+    <div id="listaTermos"></div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -70,6 +72,7 @@
         }
 
         const lista = document.getElementById("lista");
+        const listaTermos = document.getElementById("listaTermos");
 
          let filtroAtual = "todos";
 
@@ -239,6 +242,42 @@
 
         }
 
+        function carregarTermos(){
+            firebase.database().ref("termos").on("value", snapshot => {
+                listaTermos.innerHTML = "";
+
+                snapshot.forEach(item => {
+                    const termo = item.val();
+
+                    if (!termo) return;
+
+                    const div = document.createElement("div");
+                    div.classList.add("card");
+
+                    div.innerHTML = `
+                        <strong>Nome:</strong> ${termo.nome || "Não informado"} <br>
+                        <strong>CPF:</strong> ${termo.cpf || "Não informado"} <br>
+                        <strong>Telefone:</strong> ${termo.telefone || "Não informado"} <br>
+                        <strong>Produto:</strong> ${termo.produto || "Não informado"} <br>
+                        <strong>Tipo do termo:</strong> ${termo.tipo || termo.tipoTermo || "Não informado"} <br>
+                        <strong>Valor:</strong> R$ ${termo.valor || termo.valorTermo || "0"} <br><br>
+
+                        ${
+                            termo.fotoTermo || termo.fotoTermoArquivo
+                            ?`<img src="${termo.fotoTermo || termo.fotoTermoArquivo}" style="max-width:250px; border-radius:10px;">`
+                            : "Nenhuma foto disponível"
+                        }
+
+                        <br><br>
+
+                        <button onclick="excluirTermo('${item.key}')" style="background:#e74c3c; color:#fff;">Excluir Termo 🗑️</button>
+                    `;
+
+                    listaTermos.appendChild(div);
+                });
+            });
+        }
+
         function buscarTermoPorCpfAdmin(cpfBusca, divSolicitacao) {
             firebase.database().ref("termos").once("value", snapshot => {
                 let termoEncontrado = false;
@@ -287,6 +326,14 @@
             if(!confirmar) return;
 
             firebase.database().ref("reembolsos/" + id).remove();
+        }
+
+        window.excluirTermo = function(id){
+            const confirmar = confirm("Tem certeza de que deseja excluir este termo?");
+
+            if(!confirmar) return;
+
+            firebase.database().ref("termos/" + id).remove();
         }
 
 
