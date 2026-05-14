@@ -27,7 +27,7 @@
             <h2>Resumo 📊</h2>
             <p>Total de Solicitações: <span id="totalSolicitacoes">0</span></p>
             <p>Reembolsos: <span id="totalReembolsos">0</span></p>
-            <p>Reenvios: <span id="totalReenvios">0</span></p>
+            <p>Reenvios/Envios: <span id="totalReenvios">0</span></p>
             <p>Em Análise: <span id="emAnalise">0</span></p>
             <p>Aprovados: <span id="aprovados">0</span></p>
             <p>Recusados: <span id="recusados">0</span></p>
@@ -38,7 +38,7 @@
          <div class="filtros">
              <button onclick="Filtrar('todos')">Todos</button>
              <button onclick="Filtrar('reembolso')">Reembolsos</button>
-             <button onclick="Filtrar('reenvio')">Reenvios</button>
+             <button onclick="Filtrar('reenvio')">Reenvios/Envios</button>
              <button onclick="Filtrar('em análise')">Em Análise</button>
              <button onclick="Filtrar('aprovado')">Aprovados</button>
              <button onclick="Filtrar('recusado')">Recusados</button>
@@ -184,7 +184,7 @@
                         ` : ""}
 
                     ${dados.tipoSolicitacao === "reenvio" ? `
-                        <h3> Dados do Reenvio 📦 </h3>
+                        <h3> Dados do Reenvio/Envio 📦 </h3>
                         <strong>Endereço:</strong> ${dados.endereco || "Não informado"} <br>
                         <strong>Número:</strong> ${dados.numero || "Não informado"} <br>
                         <strong>Complemento:</strong> ${dados.complemento || "Não informado"} <br>
@@ -330,6 +330,7 @@
                 }
 
                 carregarDados();
+                carregarTermos();
 
         function logout() {
             localStorage.removeItem("logado");
