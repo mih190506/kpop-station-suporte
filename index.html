@@ -34,7 +34,7 @@
             <select id="tipoSolicitacao" onchange="mostrarSecoes()" required>
             <option value="">Selecione</option>
             <option value="reembolso">Reembolso</option>
-            <option value="reenvio">Reenvio</option>
+            <option value="reenvio">Reenvio/Envio</option>
             <option value="termo">Cadastro de Termo</option>
           </select> <br><br>
 
@@ -93,7 +93,7 @@
 
           <div id="secaoReenvio" style="display:none;">
 
-            <h3>Dados para Reenvio 📦</h3>
+            <h3>Dados para Reenvio/Envio 📦</h3>
             <input type="text" id="endereco" placeholder="Endereço de envio"><br><br>
             <input type="text" id="numero" placeholder="Número"><br><br>
             <input type="text" id="complemento" placeholder="Complemento"><br><br>
@@ -102,7 +102,7 @@
             <input type="text" id="estado" placeholder="Estado"><br><br>
             <input type="text" id="cep" placeholder="CEP"><br><br>
 
-            <p> Caso seja escolha o reenvio, você concorda que:
+            <p> Caso seja escolha o reenvio/envio, você concorda que:
                 <br><br>
                 - O novo envio será feito após análise <br>
                 - O prazo de envio é de até 30 dias úteis para reenvio ou retirada <br>
@@ -124,7 +124,7 @@
             <select id="tipoTermo">
               <option value="">Selecione o tipo:</option>
               <option value="reembolso">Reembolso</option>
-              <option value="reenvio">Reenvio</option>
+              <option value="reenvio">Reenvio/Envio</option>
             </select>
 
             <input type="number" id="valorTermo" step="0.01" placeholder="Valor do Termo"><br><br>

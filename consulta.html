@@ -92,9 +92,24 @@
                                 `: ""}
                                 
                                 <strong>Status:</strong> 
-                                <span style="color:${dados.status === "pago" ? "green" : "red"}">
-                                     ${dados.status || "pendente"}
+                                <span style="color:${{
+                                    "em análise": "#f1c40f",
+                                    "aprovado": "#3498db",
+                                    "recusado": "#e74c3c",
+                                    "pago": "#2ecc71",
+                                    "cancelado": "#95a5a6",
+                                    "embalando": "#9b59b6",
+                                    "enviado": "#2980b9",
+                                    "recebido": "#27ae60"
+                                 }[dados.status] || "#ccc"}">
+                                     ${dados.status || "em análise"}
                                 </span>
+
+                                ${dados.rastreio ? `
+                                <br><br>
+                                <strong>Código de rastreio:</strong> ${dados.rastreio} <br>
+                                <a href="https://rastreamento.correios.com.br/app/index.php" target="_blank">Rastrear nos Correios 📦</a>
+                                `: ""}
                             `;
 
                             const cpfSolicitacao = dados.cpf || "";
