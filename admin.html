@@ -159,7 +159,6 @@
                             <strong>Valor:</strong> R$ ${dados.valor} <br>
                             <strong>PIX:</strong> ${dados.pix || "Não informado"} <br>
                             <strong>Banco:</strong> ${dados.banco || "Não informado"} <br>
-                            <strong>Data de Reembolso:</strong> ${formatarData(dados.dataReembolso) || "Não informada"} <br>
                             <strong>Motivo:</strong> ${dados.motivo || "Não informado"} <br>
 
                             <strong>Comprovante:</strong><br>
@@ -190,7 +189,6 @@
                         <strong>Cidade:</strong> ${dados.cidade || "Não informado"} <br>
                         <strong>Estado:</strong> ${dados.estado || "Não informado"} <br>
                         <strong>CEP:</strong> ${dados.cep || "Não informado"} <br>
-                        <strong>Data de Reenvio:</strong> ${formatarData(dados.dataReenvio) || "Não informada"} <br><br>
 
                          <strong>Termos de Envio:</strong> 
                         <span style="color:${dados.acordoEnvio ? "#00ffae" : "#ff7675"}">
@@ -225,7 +223,7 @@
                     `;
 
                     const cpfSolicitacao = dados.cpf || "";
-                    buscarTermoPorCpf(cpfSolicitacao, div);
+                    buscarTermoPorCpfAdmin(cpfSolicitacao, div);
 
                     lista.appendChild(div);
                 });
@@ -250,7 +248,7 @@
 
                     if (!termo) return;
 
-                    if ((termo.cpf || "").trim() === cpfBUsca.trim ()){
+                    if ((termo.cpf || "").trim() === cpfBusca.trim ()){
                         termoEncontrado = termo;
                     }
                 });
