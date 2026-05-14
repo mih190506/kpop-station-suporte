@@ -75,7 +75,7 @@
 
 
             <label>Comprovante de Pagamento: </label>
-            <input type="file" id="comprovante" accept="image/*,.pdf" required>
+            <input type="file" id="comprovante" accept="image/*,.pdf">
 
             <p>Ao solicitar o reembolso, você concorda que:
                 <br><br>
@@ -130,7 +130,7 @@
             <input type="number" id="valorTermo" step="0.01" placeholder="Valor do Termo"><br><br>
 
             <label>Foto do Termo:</label>
-            <input type="file" id="fotoTermo" accept="image/*" required>
+            <input type="file" id="fotoTermo" accept="image/*">
 
           </div>
 
@@ -276,8 +276,12 @@
         comprovanteNome: comprovante.name,
         comprovanteArquivo: leitor.result
       });
- 
-      finalizarEnvio();
+      then(() => {
+        finalizarEnvio();
+      })
+      .catch((error) => {
+        alert("Erro ao enviar solicitação: " + error.message);
+      });
     };
 
     leitor.readAsDataURL(comprovante);
@@ -315,7 +319,14 @@
       acordoEnvio
     });
 
+    then(() => {
     finalizarEnvio();
+  })
+  .catch((error) => {   
+    console.error("Erro ao enviar solicitação: ", error);
+     alert("Erro ao enviar solicitação: " + error.message);
+  });
+
   }
 
   if (tipoSolicitacao === "termo"){
@@ -340,7 +351,12 @@
         fotoTermoArquivo: leitorTermo.result
       });
 
-      finalizarEnvio();
+      then(() => {
+        finalizarEnvio();
+      })
+      .catch((error) => {
+        alert("Erro ao enviar solicitação: " + error.message);
+      });
     };
     
     leitorTermo.readAsDataURL(fotoTermo);
