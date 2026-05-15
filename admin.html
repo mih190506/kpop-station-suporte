@@ -222,6 +222,8 @@
                         <input type="text" id="rastreio-${item.key}" placeholder="Código de rastreio">
                         <button onclick="salvarRastreio('${item.key}')">Salvar rastreio 📦</button> <br><br>
 
+                        <button onclick="removerRastreio('${item.key}')" style="background:#555;"> Remover rastreio ❌ </button>
+
                         <br><br>
 
                         <strong>Rastreio:</strong> ${dados.rastreio || "Não informado"}
@@ -364,6 +366,13 @@
             firebase.database().ref("reembolsos/" + id).update({
                 rastreio: codigo
              });
+        }
+
+        window.removerRastreio = function(id){
+
+            firebase.database().ref("reembolsos/" + id).update({
+            rastreio: ""
+            });
         }
 
 
