@@ -267,3 +267,13 @@ input[type="checkbox"] {
 .card {
     word-break: break-word;
 }
+
+.footer {
+    margin-top: 50px;
+    padding: 20px;
+    text-align: center;
+    background: #631414;
+    color: #f5f5f5;
+    border-radius: 12px 12px 0 0;
+    font-size: 14px;
+}
