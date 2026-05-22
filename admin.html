@@ -43,6 +43,9 @@
              <button onclick="Filtrar('aprovado')">Aprovados</button>
              <button onclick="Filtrar('recusado')">Recusados</button>
              <button onclick="Filtrar('pago')">Pagos</button>
+             <button onclick="Filtrar('embalando')">Embalando</button>
+             <button onclick="Filtrar('enviado')">Enviados</button>
+             <button onclick="Filtrar('recebido')">Recebidos</button>
              <button onclick="Filtrar('cancelado')">Cancelados</button>
          </div>
     </div>
@@ -289,6 +292,27 @@
                         <br><br>
 
                         <button onclick="excluirTermo('${item.key}')" style="background:#e74c3c; color:#fff;">Excluir Termo 🗑️</button>
+
+                        <strong>Status do termo:</strong>
+                        <span style="color:${{
+                                "em acordo com cliente": "#f1c40f",
+                                "cumprido": "#2ecc71",
+                                "descumprido": "#e74c3c",
+                                "em renegociação": "#9b59b6",
+                                "cancelado": "#95a5a6"
+                            }[termo.statusTermo] || "#ccc"}">
+                            ${termo.statusTermo || "em acordo com cliente"}
+                        </span>
+                        <br><br>
+
+                        <div>
+                            <button onclick="alterarStatusTermo('${item.key}', 'em acordo com cliente')">Em acordo</button>
+                            <button onclick="alterarStatusTermo('${item.key}', 'cumprido')">Cumprido ✅</button> 
+                            <button onclick="alterarStatusTermo('${item.key}', 'descumprido')">Descumprido ⚠️</button>
+                            <button onclick="alterarStatusTermo('${item.key}', 'em renegociação')">Em renegociação 🔄</button>
+                            <button onclick="alterarStatusTermo('${item.key}', 'cancelado')">Cancelado 🚫</button>
+                        </div>
+                        <br>
                     `;
 
                     listaTermos.appendChild(div);
@@ -374,6 +398,12 @@
             rastreio: ""
             });
         }
+
+        window.alterarStatusTermo = function(id, novoStatus) {
+            firebase.database().ref("termos/" + id).update({
+                statusTermo: novoStatus
+            });
+        };
 
 
     </script>
