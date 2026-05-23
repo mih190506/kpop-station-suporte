@@ -35,25 +35,44 @@
             <p>Cancelados: <span id="cancelados">0</span></p>
          </div>
 
-         <div class="filtros">
-             <button onclick="Filtrar('todos')">Todos</button>
-             <button onclick="Filtrar('reembolso')">Reembolsos</button>
-             <button onclick="Filtrar('reenvio')">Reenvios/Envios</button>
-             <button onclick="Filtrar('em análise')">Em Análise</button>
-             <button onclick="Filtrar('aprovado')">Aprovados</button>
-             <button onclick="Filtrar('recusado')">Recusados</button>
-             <button onclick="Filtrar('pago')">Pagos</button>
-             <button onclick="Filtrar('embalando')">Embalando</button>
-             <button onclick="Filtrar('enviado')">Enviados</button>
-             <button onclick="Filtrar('recebido')">Recebidos</button>
-             <button onclick="Filtrar('cancelado')">Cancelados</button>
-             <button onclick="FiltrarTermo('todos')">Todos os termos</button>
-             <button onclick="FiltrarTermo('em acordo com cliente')">Em acordo</button>
-             <button onclick="FiltrarTermo('cumprido')">Cumpridos</button>
-             <button onclick="FiltrarTermo('descumprido')">Descumpridos</button>
-             <button onclick="FiltrarTermo('renegociação')">Renegociação</button>
-             <button onclick="FiltrarTermo('cancelado')">Termos cancelados</button>
+         <div class="area-filtros">
+
+            <div class="grupo-filtro">
+
+                <h3>filtrar solicitações</h3>
+
+                <div class="filtros">
+                    <button onclick="Filtrar('todos')">Todos</button>
+                    <button onclick="Filtrar('reembolso')">Reembolsos</button>
+                    <button onclick="Filtrar('reenvio')">Reenvios/Envios</button>
+                    <button onclick="Filtrar('em análise')">Em Análise</button>
+                    <button onclick="Filtrar('aprovado')">Aprovados</button>
+                    <button onclick="Filtrar('recusado')">Recusados</button>
+                    <button onclick="Filtrar('pago')">Pagos</button>
+                    <button onclick="Filtrar('embalando')">Embalando</button>
+                    <button onclick="Filtrar('enviado')">Enviados</button>
+                    <button onclick="Filtrar('recebido')">Recebidos</button>
+                    <button onclick="Filtrar('cancelado')">Cancelados</button>
+                </div>
+
+            </div>
+
+            <div class="grupo-filtro">
+                <h3>Filtrar Termos</h3>
+
+                <div class="filtros">
+                    <button onclick="FiltrarTermo('todos')">Todos os termos</button>
+                    <button onclick="FiltrarTermo('em acordo com cliente')">Em acordo</button>
+                    <button onclick="FiltrarTermo('cumprido')">Cumpridos</button>
+                    <button onclick="FiltrarTermo('descumprido')">Descumpridos</button>
+                    <button onclick="FiltrarTermo('renegociação')">Renegociação</button>
+                    <button onclick="FiltrarTermo('cancelado')">Termos cancelados</button>
+                </div>
+            </div>
+
          </div>
+        
+             
     </div>
 
     <div id="lista"></div>
