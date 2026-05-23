@@ -112,6 +112,10 @@
             return `${partes[2]}/${partes[1]}/${partes[0]}`;
          }
 
+        function normalizar(texto) {
+        return (texto || "").toLowerCase().trim();
+        }
+
         function carregarDados() {
             
             firebase.database().ref("reembolsos").off();
@@ -166,7 +170,15 @@
                     const status = dados.status || "em análise";
                     const tipoSolicitacao = dados.tipoSolicitacao || "";
 
-                    if (filtroAtual !== "todos" && status !== filtroAtual && tipoSolicitacao !== filtroAtual) {
+                    const statusNormalizado = normalizar(status);
+                    const tipoNormalizado = normalizar(tipoSolicitacao);
+                    const filtroNormalizado = normalizar(filtroAtual);
+
+                    if (
+                        filtroNormalizado !== "todos" &&
+                        statusNormalizado !== filtroNormalizado &&
+                        tipoNormalizado !== filtroNormalizado
+                    ) {
                         return;
                     }
 
@@ -301,9 +313,16 @@
                     if (!termo) return;
 
                     const statusTermo = termo.statusTermo || "em acordo com cliente";
-                    if (filtroTermoAtual !== "todos" && statusTermo !== filtroTermoAtual) {
+
+                    const statusTermoNormalizado = normalizar(statusTermo);
+                    const filtroTermoNormalizado = normalizar(filtroTermoAtual);
+
+                    if (
+                        filtroTermoNormalizado !== "todos" &&
+                        statusTermoNormalizado !== filtroTermoNormalizado
+                    ) {
                         return;
-                    }
+                     }
 
                     const div = document.createElement("div");
                     div.classList.add("card");
