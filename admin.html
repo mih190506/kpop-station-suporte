@@ -291,7 +291,7 @@
 
         function carregarTermos(){
             firebase.database().ref("termos").off();
-            
+
             firebase.database().ref("termos").on("value", snapshot => {
                 listaTermos.innerHTML = "";
 
@@ -433,10 +433,14 @@
         }
 
         window.alterarStatusTermo = function(id, novoStatus) {
+
             firebase.database().ref("termos/" + id).update({
                 statusTermo: novoStatus
+            })
+            .then(() => {
+                carregarTermos();
             });
-        }
+        }   
 
         window.FiltrarTermo = function(status) {
             filtroTermoAtual = status;
