@@ -47,6 +47,12 @@
              <button onclick="Filtrar('enviado')">Enviados</button>
              <button onclick="Filtrar('recebido')">Recebidos</button>
              <button onclick="Filtrar('cancelado')">Cancelados</button>
+             <button onclick="FiltrarTermo('todos')">Todos os termos</button>
+             <button onclick="FiltrarTermo('em acordo com cliente')">Em acordo</button>
+             <button onclick="FiltrarTermo('cumprido')">Cumpridos</button>
+             <button onclick="FiltrarTermo('descumprido')">Descumpridos</button>
+             <button onclick="FiltrarTermo('renegociação')">Renegociação</button>
+             <button onclick="FiltrarTermo('cancelado')">Termos cancelados</button>
          </div>
     </div>
 
@@ -78,6 +84,7 @@
         const listaTermos = document.getElementById("listaTermos");
 
          let filtroAtual = "todos";
+         let filtroTermoAtual = "todos";
 
          function formatarData(data){
             if (!data) return "Não informada";
@@ -272,6 +279,11 @@
 
                     if (!termo) return;
 
+                    const statusTermo = termo.statusTermo || "em acordo com cliente";
+                    if (filtroTermoAtual !== "todos" && statusTermo !== filtroTermoAtual) {
+                        return;
+                    }
+
                     const div = document.createElement("div");
                     div.classList.add("card");
 
@@ -403,6 +415,11 @@
             firebase.database().ref("termos/" + id).update({
                 statusTermo: novoStatus
             });
+        }
+
+        window.FiltrarTermo = function(status) {
+            filtroTermoAtual = status;
+            carregarTermos();
         };
 
 
