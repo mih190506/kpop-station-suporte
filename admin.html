@@ -280,7 +280,7 @@
                             <button onclick="alterarStatus('${item.key}', 'embalando')">Embalando 📦</button>
                             <button onclick="alterarStatus('${item.key}', 'enviado')">Enviado 🚚</button>
                             <button onclick="alterarStatus('${item.key}', 'recebido')">Recebido ✅</button>
-                            ` : ""}
+                        ` : ""}
                             
                             <button onclick="alterarStatus('${item.key}', 'cancelado')" style="background:#555;">Cancelar</button>
                         </div>
@@ -307,10 +307,10 @@
         }
 
         function carregarTermos(){
-            firebase.database().ref("termos").off();
-
             firebase.database().ref("termos").on("value", snapshot => {
                 listaTermos.innerHTML = "";
+
+                let encontrouTermo = false;
 
                 snapshot.forEach(item => {
                     const termo = item.val();
@@ -327,7 +327,9 @@
                         statusTermoNormalizado !== filtroTermoNormalizado
                     ) {
                         return;
-                     }
+                    }
+
+                    encontrouTermo = true;
 
                     const div = document.createElement("div");
                     div.classList.add("card");
@@ -347,8 +349,6 @@
                         }
 
                         <br><br>
-
-                        <button onclick="excluirTermo('${item.key}')" style="background:#e74c3c; color:#fff;">Excluir Termo 🗑️</button>
 
                         <strong>Status do termo:</strong>
                         <span style="color:${{
@@ -370,10 +370,20 @@
                             <button onclick="alterarStatusTermo('${item.key}', 'cancelado')">Cancelado 🚫</button>
                         </div>
                         <br>
+
+                        <button onclick="excluirTermo('${item.key}')" style="background:#e74c3c; color:#fff;">Excluir Termo 🗑️</button>
                     `;
 
                     listaTermos.appendChild(div);
                 });
+
+                if(!encontrouTermo){
+                    listaTermos.innerHTML = `
+                    <div class="card">
+                        Nenhum termo encontrado para o filtro.
+                    </div>    
+                    `;
+                }
             });
         }
 
@@ -469,6 +479,10 @@
         window.FiltrarTermo = function(status) {
             filtroTermoAtual = status;
             carregarTermos();
+
+            document.getElementById("listaTermos").scrollIntoView({
+                behavior: "smooth"
+            });
         };
 
 
