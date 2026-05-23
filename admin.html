@@ -290,6 +290,8 @@
         }
 
         function carregarTermos(){
+            firebase.database().ref("termos").off();
+            
             firebase.database().ref("termos").on("value", snapshot => {
                 listaTermos.innerHTML = "";
 
@@ -329,7 +331,7 @@
                                 "em acordo com cliente": "#f1c40f",
                                 "cumprido": "#2ecc71",
                                 "descumprido": "#e74c3c",
-                                "em renegociação": "#9b59b6",
+                                "renegociação": "#9b59b6",
                                 "cancelado": "#95a5a6"
                             }[termo.statusTermo] || "#ccc"}">
                             ${termo.statusTermo || "em acordo com cliente"}
